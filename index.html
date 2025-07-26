@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Realm - Interactive Learning Platform</title>
+    <title>English Realm - منصة تعليم اللغة الإنجليزية</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <style>
         * {
             margin: 0;
@@ -16,596 +17,1068 @@
         
         :root {
             --primary: #4361ee;
-            --secondary: #3a0ca3;
-            --accent: #4cc9f0;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
             --light: #f8f9fa;
             --dark: #212529;
-            --success: #4ade80;
-            --warning: #facc15;
-            --danger: #f87171;
-            --gray: #6c757d;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --card-bg: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
         }
         
         body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
             color: var(--light);
             min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            flex-direction: column;
+            overflow-x: hidden;
         }
         
         .container {
-            width: 100%;
             max-width: 1200px;
             margin: 0 auto;
+            padding: 20px;
         }
         
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            transition: all 0.3s ease;
-        }
-        
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-        
-        .view {
-            padding: 40px;
+        .screen {
             display: flex;
             flex-direction: column;
-            min-height: 600px;
+            min-height: 100vh;
+            width: 100%;
+            padding: 20px;
+            transition: all 0.5s ease;
         }
         
         .hidden {
             display: none;
         }
         
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .logo h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            background: linear-gradient(45deg, var(--accent), #7209b7, #f72585);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-        }
-        
-        .logo .realm {
-            font-size: 4.5rem;
-            letter-spacing: 2px;
-        }
-        
-        .subtitle {
-            text-align: center;
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 1.6;
-        }
-        
-        .form-group {
-            margin-bottom: 25px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--accent);
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 15px 20px;
-            border: none;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            color: white;
-            font-size: 1rem;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: rgba(255, 255, 255, 0.15);
-        }
-        
-        .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-        
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            color: white;
-            margin-top: 10px;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 7px 14px rgba(0, 0, 0, 0.2);
-        }
-        
-        .btn-google {
-            background: white;
-            color: var(--dark);
-            display: flex;
-            align-items: center;
+        /* تصميم شاشة إدخال البيانات */
+        #data-entry {
             justify-content: center;
-            gap: 10px;
-        }
-        
-        .btn-google:hover {
-            background: #f1f1f1;
-        }
-        
-        .btn-start {
-            background: linear-gradient(45deg, #f72585, #7209b7);
-            font-size: 1.3rem;
-            padding: 18px;
-            margin-top: 20px;
-            letter-spacing: 1px;
-        }
-        
-        .divider {
-            display: flex;
             align-items: center;
-            margin: 25px 0;
-        }
-        
-        .divider::before,
-        .divider::after {
-            content: "";
-            flex: 1;
-            height: 1px;
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .divider span {
-            padding: 0 15px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-        
-        .dashboard-header {
             text-align: center;
-            margin-bottom: 40px;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
         }
         
-        .dashboard-header h2 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+        .logo {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--light);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .logo span {
             color: var(--accent);
         }
         
         .welcome-text {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            max-width: 700px;
             line-height: 1.6;
         }
         
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        
-        .dashboard-card {
+        .form-container {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 25px;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
-        .dashboard-card:hover {
-            transform: translateY(-5px);
+        .form-title {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: var(--light);
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+            text-align: right;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
             background: rgba(255, 255, 255, 0.15);
+            color: var(--light);
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
         }
         
-        .dashboard-card i {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: var(--accent);
+        .input-group input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.25);
+            border-color: var(--accent);
         }
         
-        .dashboard-card h3 {
-            font-size: 1.3rem;
-            margin-bottom: 10px;
-        }
-        
-        .dashboard-card p {
+        .input-group input::placeholder {
             color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
         }
         
-        .footer {
-            margin-top: auto;
-            padding-top: 30px;
-            text-align: center;
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 35px;
+            font-size: 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
         }
         
-        .social-links {
-            display: flex;
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        /* شاشة تسجيل الدخول عبر جوجل */
+        #google-signin {
             justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
         }
         
-        .social-links a {
+        .login-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 50px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .login-icon {
+            font-size: 4rem;
+            color: var(--accent);
+            margin-bottom: 25px;
+        }
+        
+        .login-title {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .login-text {
+            font-size: 1.2rem;
+            margin-bottom: 35px;
+            line-height: 1.7;
+        }
+        
+        .google-btn {
+            background: #ffffff;
+            color: #757575;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: none;
+            width: 100%;
+        }
+        
+        .google-btn i {
+            font-size: 1.8rem;
+            margin-left: 15px;
+            color: #4285f4;
+        }
+        
+        .google-btn:hover {
+            background: #f5f5f5;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
+        
+        /* الصفحة الرئيسية */
+        #main-page {
+            background: linear-gradient(to bottom, #1a2980, #26d0ce);
+        }
+        
+        header {
+            padding: 25px 0;
+            text-align: center;
+        }
+        
+        .main-logo {
+            font-size: 3rem;
+            font-weight: 800;
             color: white;
-            font-size: 1.5rem;
+        }
+        
+        .main-logo span {
+            color: #ffd166;
+        }
+        
+        .hero {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .hero-text {
+            font-size: 2.2rem;
+            max-width: 800px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .start-btn {
+            background: #ffd166;
+            color: #1a2980;
+            font-size: 1.4rem;
+            padding: 18px 50px;
+            border-radius: 15px;
+            font-weight: 700;
+            box-shadow: 0 8px 25px rgba(255, 209, 102, 0.5);
+            margin-top: 20px;
+        }
+        
+        .start-btn:hover {
+            background: #ffca52;
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(255, 209, 102, 0.7);
+        }
+        
+        footer {
+            padding: 30px 0;
+            text-align: center;
+        }
+        
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .social-icons a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 1.8rem;
             transition: all 0.3s ease;
         }
         
-        .social-links a:hover {
-            transform: translateY(-5px);
+        .social-icons a:hover {
             background: var(--primary);
+            transform: translateY(-5px);
         }
         
-        .copyright {
-            margin-top: 20px;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9rem;
+        /* واجهة الوحدات */
+        #units-page {
+            background: linear-gradient(to bottom, #141e30, #243b55);
+            padding-top: 30px;
         }
         
-        .user-info {
+        .page-title {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
         }
         
-        .user-info h3 {
-            margin-bottom: 10px;
+        .units-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            padding: 20px;
+        }
+        
+        .unit-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .unit-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+        
+        .unit-card i {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
             color: var(--accent);
         }
         
-        .progress-bar {
-            height: 8px;
+        .unit-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+        
+        .unit-card p {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+        
+        /* واجهة الخانات الفرعية */
+        .subunits-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            padding: 20px;
+        }
+        
+        .subunit-card {
             background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 18px;
+            padding: 25px 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .subunit-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+        }
+        
+        .subunit-card i {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            color: #ffd166;
+        }
+        
+        .subunit-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 30px;
             border-radius: 10px;
-            margin: 30px 0;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px auto;
+            display: block;
+            max-width: 200px;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        /* صفحة الاختبار */
+        #quiz-page {
+            background: linear-gradient(to bottom, #0f2027, #203a43);
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .quiz-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .quiz-title {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            color: #ffd166;
+        }
+        
+        .question-container {
+            margin-bottom: 35px;
+        }
+        
+        .question-text {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .option {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 18px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.2rem;
+            text-align: right;
+            border: 2px solid transparent;
+        }
+        
+        .option:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .option.selected {
+            background: var(--primary);
+            border-color: #ffd166;
+        }
+        
+        .submit-btn {
+            background: #4cc9f0;
+            color: #0f2027;
+            padding: 16px 40px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: block;
+            margin: 30px auto 0;
+            box-shadow: 0 5px 20px rgba(76, 201, 240, 0.4);
+        }
+        
+        .submit-btn:hover {
+            background: #3ab0d6;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(76, 201, 240, 0.6);
+        }
+        
+        .result-container {
+            text-align: center;
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 15px;
+            font-size: 1.4rem;
+            display: none;
+        }
+        
+        .result-success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4CAF50;
+            color: #4CAF50;
+        }
+        
+        .result-error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 2px solid #F44336;
+            color: #F44336;
+        }
+        
+        /* صفحة الدرس */
+        #lesson-page {
+            background: linear-gradient(to bottom, #1a1a2e, #16213e);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .lesson-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+        
+        .lesson-header {
+            margin-bottom: 30px;
+        }
+        
+        .lesson-title {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            color: #ffd166;
+        }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
             overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            margin: 30px 0;
         }
         
-        .progress {
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, var(--accent), var(--primary));
-            width: 45%;
-            border-radius: 10px;
+            border: none;
         }
         
+        .lesson-btn {
+            background: #f72585;
+            color: white;
+            padding: 15px 35px;
+            font-size: 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-weight: 600;
+            margin-top: 20px;
+            box-shadow: 0 5px 20px rgba(247, 37, 133, 0.4);
+        }
+        
+        .lesson-btn:hover {
+            background: #e91e63;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(247, 37, 133, 0.6);
+        }
+        
+        /* تصميم متجاوب */
         @media (max-width: 768px) {
-            .card {
-                max-width: 100%;
-            }
-            
-            .view {
-                padding: 30px 20px;
-                min-height: auto;
-            }
-            
-            .logo h1 {
+            .logo {
                 font-size: 2.5rem;
             }
             
-            .logo .realm {
-                font-size: 3.5rem;
+            .form-container {
+                padding: 30px;
+            }
+            
+            .hero-text {
+                font-size: 1.8rem;
+            }
+            
+            .units-container {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .quiz-container, .lesson-container {
+                padding: 25px;
+            }
+            
+            .question-text {
+                font-size: 1.3rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .welcome-text {
+                font-size: 1.2rem;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+            
+            .hero-text {
+                font-size: 1.5rem;
+            }
+            
+            .start-btn {
+                padding: 15px 30px;
+                font-size: 1.2rem;
+            }
+            
+            .units-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .subunits-container {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Initial Gate View -->
-        <div class="card" id="initial-gate-view">
-            <div class="view">
-                <div class="logo">
-                    <h1>Interactive <span class="realm">Realm</span></h1>
-                    <div class="subtitle">Your gateway to immersive learning experiences</div>
-                </div>
-                
-                <form id="initial-form">
-                    <div class="form-group">
-                        <label for="fullname">Full Name (Three Names)</label>
-                        <input type="text" id="fullname" class="form-control" placeholder="e.g. John Michael Smith" required>
+    <!-- واجهة إدخال البيانات -->
+    <div id="data-entry" class="screen">
+        <div class="container">
+            <div class="logo">English <span>Realm</span></div>
+            <p class="welcome-text">مرحبًا بك في منصتنا التعليمية الرائدة لتعلم اللغة الإنجليزية. نرجو إدخال بياناتك الأساسية للبدء في رحلة التعلم.</p>
+            
+            <div class="form-container">
+                <h2 class="form-title">بيانات المستخدم</h2>
+                <form id="user-data-form">
+                    <div class="input-group">
+                        <label for="full-name">الاسم الثلاثي</label>
+                        <input type="text" id="full-name" placeholder="أدخل اسمك الثلاثي" required>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="phone">Phone Number</label>
-                        <input type="tel" id="phone" class="form-control" placeholder="e.g. (123) 456-7890" required>
+                    <div class="input-group">
+                        <label for="phone-number">رقم الهاتف</label>
+                        <input type="tel" id="phone-number" placeholder="أدخل رقم هاتفك" required>
                     </div>
                     
-                    <button type="submit" class="btn btn-primary">Continue to Sign In</button>
+                    <button type="submit" class="btn">متابعة</button>
                 </form>
-                
-                <div class="footer">
-                    <div class="social-links">
-                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" title="YouTube"><i class="fab fa-youtube"></i></a>
-                        <a href="#" title="Telegram"><i class="fab fa-telegram-plane"></i></a>
-                    </div>
-                    <div class="copyright">© 2023 Realm Learning Platform. All rights reserved.</div>
-                </div>
             </div>
         </div>
-        
-        <!-- Google Sign-In View -->
-        <div class="card hidden" id="google-signin-view">
-            <div class="view">
-                <div class="logo">
-                    <h1>Sign In to <span class="realm">Realm</span></h1>
-                    <div class="subtitle">Continue with your Google account to access the platform</div>
+    </div>
+    
+    <!-- واجهة تسجيل الدخول عبر جوجل -->
+    <div id="google-signin" class="screen hidden">
+        <div class="login-box">
+            <div class="login-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h2 class="login-title">تسجيل الدخول</h2>
+            <p class="login-text">للمتابعة واستخدام المنصة، يجب عليك تسجيل الدخول باستخدام حساب Google الخاص بك. سيسمح لك ذلك بالوصول إلى جميع الدروس والمواد التعليمية.</p>
+            
+            <button id="google-login-btn" class="google-btn">
+                <span>تسجيل الدخول باستخدام Google</span>
+                <i class="fab fa-google"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- الصفحة الرئيسية -->
+    <div id="main-page" class="screen hidden">
+        <div class="container">
+            <header>
+                <h1 class="main-logo">English <span>Realm</span></h1>
+            </header>
+            
+            <div class="hero">
+                <p class="hero-text">مرحبًا بك في عالم English Realm، حيث يمكنك تعلم اللغة الإنجليزية بطريقة تفاعلية وممتعة. تقدم منصتنا دروسًا شاملة واختبارات تفاعلية لضمان تطورك المستمر في اللغة.</p>
+                <button id="start-btn" class="btn start-btn">ابدأ التعلم</button>
+            </div>
+            
+            <footer>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
                 </div>
-                
-                <div class="user-info">
-                    <h3>Welcome, <span id="user-name">[User Name]</span></h3>
-                    <p>Phone: <span id="user-phone">[User Phone]</span></p>
+            </footer>
+        </div>
+    </div>
+    
+    <!-- واجهة الوحدات -->
+    <div id="units-page" class="screen hidden">
+        <div class="container">
+            <header>
+                <h1 class="main-logo">English <span>Realm</span></h1>
+            </header>
+            
+            <h2 class="page-title">الوحدات التعليمية</h2>
+            
+            <div class="units-container">
+                <!-- سيتم إنشاء الوحدات ديناميكيًا باستخدام JavaScript -->
+            </div>
+            
+            <footer>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
                 </div>
-                
-                <div class="divider">
-                    <span>Mandatory Sign-In</span>
+            </footer>
+        </div>
+    </div>
+    
+    <!-- واجهة الخانات الفرعية -->
+    <div id="subunits-page" class="screen hidden">
+        <div class="container">
+            <header>
+                <h1 class="main-logo">English <span>Realm</span></h1>
+            </header>
+            
+            <h2 class="page-title" id="subunits-title">الوحدة التعليمية</h2>
+            
+            <div class="subunits-container">
+                <!-- سيتم إنشاء الخانات الفرعية ديناميكيًا باستخدام JavaScript -->
+            </div>
+            
+            <button id="back-to-units" class="back-btn">العودة إلى الوحدات</button>
+            
+            <footer>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
                 </div>
+            </footer>
+        </div>
+    </div>
+    
+    <!-- صفحة الاختبار -->
+    <div id="quiz-page" class="screen hidden">
+        <div class="quiz-container">
+            <div class="quiz-header">
+                <h2 class="quiz-title">اختبار الوحدة</h2>
+                <p>اختر الإجابة الصحيحة من بين الخيارات التالية</p>
+            </div>
+            
+            <div class="question-container">
+                <p class="question-text" id="question-text">ما هو الترجمة الصحيحة لكلمة "Book"؟</p>
                 
-                <div id="google-signin-button" class="btn btn-google">
-                    <i class="fab fa-google"></i> Sign in with Google
+                <div class="options-container" id="options-container">
+                    <!-- سيتم إنشاء الخيارات ديناميكيًا -->
                 </div>
-                
-                <div class="progress-bar">
-                    <div class="progress"></div>
-                </div>
-                
-                <p class="subtitle">You must sign in with Google to access all features of Realm. No bypass available.</p>
-                
-                <div class="footer">
-                    <div class="social-links">
-                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" title="YouTube"><i class="fab fa-youtube"></i></a>
-                        <a href="#" title="Telegram"><i class="fab fa-telegram-plane"></i></a>
-                    </div>
-                </div>
+            </div>
+            
+            <button id="submit-quiz" class="submit-btn">تأكيد الإجابة</button>
+            
+            <div id="result-container" class="result-container">
+                <!-- سيتم عرض النتيجة هنا -->
             </div>
         </div>
-        
-        <!-- Main Interface View -->
-        <div class="card hidden" id="main-interface-view">
-            <div class="view">
-                <div class="logo">
-                    <h1>Welcome to <span class="realm">Realm</span></h1>
-                </div>
-                
-                <div class="subtitle">
-                    Realm is an interactive learning platform designed to transform education through immersive experiences, 
-                    personalized learning paths, and real-time collaboration. Our mission is to make learning engaging and 
-                    accessible for everyone.
-                </div>
-                
-                <button id="start-button" class="btn btn-primary btn-start">Start Your Learning Journey</button>
-                
-                <div class="dashboard-grid">
-                    <div class="dashboard-card">
-                        <i class="fas fa-graduation-cap"></i>
-                        <h3>Courses</h3>
-                        <p>Explore diverse learning paths</p>
-                    </div>
-                    <div class="dashboard-card">
-                        <i class="fas fa-users"></i>
-                        <h3>Community</h3>
-                        <p>Connect with fellow learners</p>
-                    </div>
-                </div>
-                
-                <div class="footer">
-                    <div class="social-links">
-                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" title="YouTube"><i class="fab fa-youtube"></i></a>
-                        <a href="#" title="Telegram"><i class="fab fa-telegram-plane"></i></a>
-                    </div>
-                </div>
+    </div>
+    
+    <!-- صفحة الدرس -->
+    <div id="lesson-page" class="screen hidden">
+        <div class="lesson-container">
+            <div class="lesson-header">
+                <h2 class="lesson-title">درس الوحدة التعليمية</h2>
+                <p>شاهد الفيديو التعليمي التالي بعناية</p>
             </div>
-        </div>
-        
-        <!-- Dashboard View -->
-        <div class="card hidden" id="dashboard-view">
-            <div class="view">
-                <div class="dashboard-header">
-                    <h2>Learning Dashboard</h2>
-                    <div class="subtitle">Welcome back to your personalized learning space</div>
-                </div>
-                
-                <div class="user-info">
-                    <h3>Hello, <span id="dashboard-name">[User Name]</span></h3>
-                    <p>Ready to continue your learning journey?</p>
-                </div>
-                
-                <div class="progress-bar">
-                    <div class="progress"></div>
-                </div>
-                <p class="subtitle">Your learning progress: 45% complete</p>
-                
-                <div class="dashboard-grid">
-                    <div class="dashboard-card">
-                        <i class="fas fa-book-open"></i>
-                        <h3>My Courses</h3>
-                        <p>Continue where you left off</p>
-                    </div>
-                    <div class="dashboard-card">
-                        <i class="fas fa-tasks"></i>
-                        <h3>Assignments</h3>
-                        <p>2 pending tasks</p>
-                    </div>
-                    <div class="dashboard-card">
-                        <i class="fas fa-chart-line"></i>
-                        <h3>Progress</h3>
-                        <p>View your learning stats</p>
-                    </div>
-                    <div class="dashboard-card">
-                        <i class="fas fa-trophy"></i>
-                        <h3>Achievements</h3>
-                        <p>5 badges earned</p>
-                    </div>
-                </div>
-                
-                <div class="dashboard-grid">
-                    <div class="dashboard-card">
-                        <i class="fas fa-calendar-alt"></i>
-                        <h3>Schedule</h3>
-                        <p>Upcoming learning sessions</p>
-                    </div>
-                    <div class="dashboard-card">
-                        <i class="fas fa-comments"></i>
-                        <h3>Discussions</h3>
-                        <p>Join the conversation</p>
-                    </div>
-                </div>
-                
-                <div class="footer">
-                    <div class="social-links">
-                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" title="YouTube"><i class="fab fa-youtube"></i></a>
-                        <a href="#" title="Telegram"><i class="fab fa-telegram-plane"></i></a>
-                    </div>
-                    <div class="copyright">© 2023 Realm Learning Platform. All rights reserved.</div>
-                </div>
+            
+            <div class="video-container">
+                <iframe id="lesson-video" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
+            
+            <button id="back-to-subunit" class="lesson-btn">العودة إلى الدروس</button>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get all views
-            const initialGateView = document.getElementById('initial-gate-view');
-            const googleSignInView = document.getElementById('google-signin-view');
-            const mainInterfaceView = document.getElementById('main-interface-view');
-            const dashboardView = document.getElementById('dashboard-view');
+        // تهيئة Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyA5XxO5J7Z5Z7Z5Z7Z5Z7Z5Z7Z5Z7Z5Z7Z",
+            authDomain: "english-realm-7a7a7.firebaseapp.com",
+            projectId: "english-realm-7a7a7",
+            storageBucket: "english-realm-7a7a7.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:abcdefghijklmnopqrstuvw"
+        };
+        
+        // تهيئة Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        
+        // عناصر الصفحة
+        const dataEntryScreen = document.getElementById('data-entry');
+        const googleSigninScreen = document.getElementById('google-signin');
+        const mainScreen = document.getElementById('main-page');
+        const unitsScreen = document.getElementById('units-page');
+        const subunitsScreen = document.getElementById('subunits-page');
+        const quizScreen = document.getElementById('quiz-page');
+        const lessonScreen = document.getElementById('lesson-page');
+        
+        // الأزرار والنماذج
+        const userDataForm = document.getElementById('user-data-form');
+        const googleLoginBtn = document.getElementById('google-login-btn');
+        const startBtn = document.getElementById('start-btn');
+        const backToUnitsBtn = document.getElementById('back-to-units');
+        const backToSubunitBtn = document.getElementById('back-to-subunit');
+        const submitQuizBtn = document.getElementById('submit-quiz');
+        
+        // العناصر الديناميكية
+        const unitsContainer = document.querySelector('.units-container');
+        const subunitsContainer = document.querySelector('.subunits-container');
+        const subunitsTitle = document.getElementById('subunits-title');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const resultContainer = document.getElementById('result-container');
+        const lessonVideo = document.getElementById('lesson-video');
+        
+        // بيانات التطبيق
+        let currentUnit = null;
+        let currentSubunit = null;
+        let userData = {};
+        
+        // عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            // التحقق من حالة المستخدم
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // المستخدم مسجل الدخول
+                    if (localStorage.getItem('userData')) {
+                        showScreen(mainScreen);
+                    } else {
+                        showScreen(dataEntryScreen);
+                    }
+                } else {
+                    // المستخدم غير مسجل الدخول
+                    showScreen(dataEntryScreen);
+                }
+            });
             
-            // Form elements
-            const initialForm = document.getElementById('initial-form');
-            const fullnameInput = document.getElementById('fullname');
-            const phoneInput = document.getElementById('phone');
-            
-            // User info placeholders
-            const userName = document.getElementById('user-name');
-            const userPhone = document.getElementById('user-phone');
-            const dashboardName = document.getElementById('dashboard-name');
-            
-            // Buttons
-            const startButton = document.getElementById('start-button');
-            
-            // Handle initial form submission
-            initialForm.addEventListener('submit', function(e) {
+            // معالجة إرسال بيانات المستخدم
+            userDataForm.addEventListener('submit', (e) => {
                 e.preventDefault();
+                const fullName = document.getElementById('full-name').value;
+                const phoneNumber = document.getElementById('phone-number').value;
                 
-                const fullName = fullnameInput.value.trim();
-                const phone = phoneInput.value.trim();
-                
-                // Validate full name has three names
-                const nameParts = fullName.split(' ').filter(part => part.length > 0);
-                if (nameParts.length < 3) {
-                    alert('Please enter your full name with at least three names (e.g. John Michael Smith)');
-                    return;
+                if (fullName && phoneNumber) {
+                    userData = { fullName, phoneNumber };
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    showScreen(googleSigninScreen);
+                } else {
+                    alert('الرجاء إدخال جميع البيانات المطلوبة');
                 }
-                
-                // Basic phone validation
-                if (phone.length < 10) {
-                    alert('Please enter a valid phone number');
-                    return;
-                }
-                
-                // Update user info for next view
-                userName.textContent = fullName;
-                userPhone.textContent = phone;
-                dashboardName.textContent = fullName;
-                
-                // Switch to Google sign-in view
-                initialGateView.classList.add('hidden');
-                googleSignInView.classList.remove('hidden');
             });
             
-            // Google Sign-In Button Handler
-            document.getElementById('google-signin-button').addEventListener('click', function() {
-                // This is a simulation since we can't implement real Google Auth without a backend
-                // In a real implementation, we would use Google Identity Services
-                
-                // Simulate Google sign-in process
-                googleSignInView.querySelector('.subtitle').textContent = 'Signing in...';
-                
-                setTimeout(function() {
-                    // After successful sign-in
-                    googleSignInView.classList.add('hidden');
-                    mainInterfaceView.classList.remove('hidden');
-                }, 1500);
+            // تسجيل الدخول باستخدام Google
+            googleLoginBtn.addEventListener('click', () => {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                auth.signInWithPopup(provider)
+                    .then((result) => {
+                        showScreen(mainScreen);
+                    })
+                    .catch((error) => {
+                        console.error('خطأ في تسجيل الدخول: ', error);
+                        alert('حدث خطأ أثناء تسجيل الدخول. الرجاء المحاولة مرة أخرى.');
+                    });
             });
             
-            // Start button handler
-            startButton.addEventListener('click', function() {
-                mainInterfaceView.classList.add('hidden');
-                dashboardView.classList.remove('hidden');
+            // بدء الاستعراض
+            startBtn.addEventListener('click', () => {
+                showScreen(unitsScreen);
+                loadUnits();
             });
             
-            // Animation for dashboard cards on hover
-            const dashboardCards = document.querySelectorAll('.dashboard-card');
-            dashboardCards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-10px)';
-                });
-                
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                });
+            // العودة من الخانات الفرعية إلى الوحدات
+            backToUnitsBtn.addEventListener('click', () => {
+                showScreen(unitsScreen);
             });
+            
+            // العودة من صفحة الدرس إلى الخانة الفرعية
+            backToSubunitBtn.addEventListener('click', () => {
+                showScreen(subunitsScreen);
+            });
+            
+            // تقديم الإجابة في الاختبار
+            submitQuizBtn.addEventListener('click', checkAnswer);
         });
+        
+        // دالة إظهار شاشة وإخفاء البقية
+        function showScreen(screen) {
+            // إخفاء جميع الشاشات
+            document.querySelectorAll('.screen').forEach(s => {
+                s.classList.add('hidden');
+            });
+            // إظهار الشاشة المطلوبة
+            screen.classList.remove('hidden');
+        }
+        
+        // تحميل الوحدات التعليمية
+        function loadUnits() {
+            unitsContainer.innerHTML = '';
+            
+            // إنشاء 12 وحدة
+            for (let i = 1; i <= 12; i++) {
+                const unit = document.createElement('div');
+                unit.className = 'unit-card';
+                unit.innerHTML = `
+                    <i class="fas fa-book"></i>
+                    <h3>Unit ${i}</h3>
+                    <p>الوحدة التعليمية ${i} تحتوي على دروس واختبارات متنوعة</p>
+                `;
+                
+                unit.addEventListener('click', () => {
+                    currentUnit = i;
+                    subunitsTitle.textContent = `الوحدة ${i} - الدروس`;
+                    loadSubunits();
+                    showScreen(subunitsScreen);
+                });
+                
+                unitsContainer.appendChild(unit);
+            }
+        }
+        
+        // تحميل الخانات الفرعية داخل الوحدة
+        function loadSubunits() {
+            subunitsContainer.innerHTML = '';
+            
+            // عناوين الخانات الفرعية
+            const subunitTitles = [
+                'المصطلحات الأساسية',
+                'القواعد النحوية',
+                'الاستماع والفهم',
+                'المحادثة العملية',
+                'القراءة التحليلية',
+                'الكتابة الإبداعية',
+                'المراجعة الشاملة',
+                'التمارين التفاعلية',
+                'التقييم الذاتي',
+                'الملخص النهائي'
+            ];
+            
+            // إنشاء 10 خانات فرعية
+            for (let i = 1; i <= 10; i++) {
+                const subunit = document.createElement('div');
+                subunit.className = 'subunit-card';
+                subunit.innerHTML = `
+                    <i class="fas fa-${i === 1 ? 'globe' : (i === 10 ? 'graduation-cap' : 'file-alt')}"></i>
+                    <h3>${subunitTitles[i-1]}</h3>
+                `;
+                
+                subunit.addEventListener('click', () => {
+                    currentSubunit = i;
+                    
+                    // إذا كانت الخانة الأولى (المصطلحات) نفتح الاختبار مباشرة
+                    if (i === 1) {
+                        loadQuiz();
+                        showScreen(quizScreen);
+                    } else {
+                        loadLesson();
+                        showScreen(lessonScreen);
+                    }
+                });
+                
+                subunitsContainer.appendChild(subunit);
+            }
+        }
+        
+        // تحميل الاختبار
+        function loadQuiz() {
+            // مسح الاختيارات السابقة
+            optionsContainer.innerHTML = '';
+            resultContainer.style.display = 'none';
+            
+            // بيانات الأسئلة (يمكن استبدالها بقاعدة بيانات)
+            const questions = [
+                {
+                    question: "ما هو الترجمة الصحيحة لكلمة 'Book'؟",
+                    options: ["كرسي", "كتاب", "طاولة", "قلم"],
+                    correct: 1
+                },
+                {
+                    question: "ما هو جمع كلمة 'Child'؟",
+                    options: ["Childs", "Childes", "Children", "Childies"],
+                    correct: 2
+                },
+                {
+                    question: "ما هو المضارع المستمر للفعل 'Run'؟",
+                    options: ["Ran", "Running", "Runned", "Runs"],
+                    correct: 1
+                }
+            ];
+            
+            // اختيار سؤال عشوائي
+            const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
+            
+            // عرض السؤال
+            questionText.textContent = randomQuestion.question;
+            
+            // عرض الخيارات
+            randomQuestion.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.dataset.index = index;
+                
+                optionElement.addEventListener('click', () => {
+                    // إزالة التحديد من جميع الخيارات
+                    document.querySelectorAll('.option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    // تحديد الخيار الحالي
+                    optionElement.classList.add('selected');
+                });
+                
+                optionsContainer.appendChild(optionElement);
+            });
+        }
+        
+        // التحقق من الإجابة
+        function checkAnswer() {
+            const selectedOption = document.querySelector('.option.selected');
+            
+            if (!selectedOption) {
+                alert('الرجاء اختيار إجابة قبل التقديم');
+                return;
+            }
+            
+            const selectedIndex = parseInt(selectedOption.dataset.index);
+            const correctIndex = 1; // في هذا المثال، الإجابة الصحيحة هي دائماً الخيار الثاني
+            
+            if (selectedIndex === correctIndex) {
+                resultContainer.textContent = 'إجابة صحيحة! أحسنت!';
+                resultContainer.className = 'result-container result-success';
+            } else {
+                resultContainer.textContent = 'إجابة خاطئة! حاول مرة أخرى.';
+                resultContainer.className = 'result-container result-error';
+            }
+            
+            resultContainer.style.display = 'block';
+        }
+        
+        // تحميل الدرس (الفيديو)
+        function loadLesson() {
+            // رابط الفيديو على Google Drive
+            const videoId = '118j7mjOH5KCo_Ool3FPyB3bv90HGnjMR';
+            lessonVideo.src = `https://drive.google.com/file/d/${videoId}/preview`;
+        }
     </script>
 </body>
 </html>
