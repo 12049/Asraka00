@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login Form</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 300px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 10px;
+      background-color: #4285F4;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-box">
+  <h3>Login to Continue</h3>
+  <input type="text" id="fullname" placeholder="Full Name">
+  <input type="tel" id="phone" placeholder="Phone Number">
+  <button onclick="nextStep()">Next</button>
+</div>
+
+<script>
+  function nextStep() {
+    const name = document.getElementById('fullname').value;
+    const phone = document.getElementById('phone').value;
+if (name === '' || phone === '') {
+      alert('Please fill in all fields.');
+    } else {
+      // الخطوة القادمة مثلاً: فتح صفحة تسجيل غوغل
+      window.location.href = "google-signin.html";
+    }
+  }
+</script>
+
+</body>
+</html>
