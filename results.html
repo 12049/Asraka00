@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نتائج الاختبار</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="results-container">
+            <h2>نتيجة الاختبار</h2>
+            <div class="score-circle" id="scoreCircle">
+                <div class="score-inner">
+                    <span id="scoreValue">0%</span>
+                </div>
+            </div>
+            <div class="result-details">
+                <div class="detail-item">
+                    <span>عدد الأسئلة</span>
+                    <span id="totalQuestions">0</span>
+                </div>
+                <div class="detail-item">
+                    <span>الإجابات الصحيحة</span>
+                    <span id="correctAnswers">0</span>
+                </div>
+                <div class="detail-item">
+                    <span>الإجابات الخاطئة</span>
+                    <span id="wrongAnswers">0</span>
+                </div>
+                <div class="detail-item">
+                    <span>الدرجة</span>
+                    <span id="finalScore">0</span>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="restart-btn" id="restartBtn">إعادة الاختبار</button>
+                <button class="home-btn" id="homeBtn">الصفحة الرئيسية</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
