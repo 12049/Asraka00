@@ -1057,11 +1057,32 @@
       background-origin: border-box;
       background-clip: content-box, border-box;
     }
+
+    /* زر المطور في القائمة الجانبية */
+    .developer-btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      background: var(--primary);
+      color: white;
+      text-align: center;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: bold;
+      margin-top: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .developer-btn:hover {
+      background: #d32a78;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(232, 62, 140, 0.3);
+    }
   </style> 
  </head> 
  <body> <!-- الشريط العلوي --> 
   <div class="top-bar"> 
-   <div class="container"> <!-- اسم وعد على الطرف الأيمن --> <a href="#" class="logo">وعد عذله</a> <!-- عناصر التحكم على الطرف الأيسر --> 
+   <div class="container"> <!-- اسم وعد على الطرف الأيمن --> <a href="#" class="logo">𝐖𝐀𝐀𝐃 𝐘𝐀𝐒𝐒𝐈𝐑</a> <!-- عناصر التحكم على الطرف الأيسر --> 
     <div class="top-controls"> <!-- زر الصوت --> 
      <div class="mute-btn" id="muteBtn"> <i class="fas fa-volume-up"></i> 
      </div> <!-- زر القائمة (الثلاث شرط) --> 
@@ -1085,12 +1106,20 @@
    </div> 
    <ul class="sidebar-menu"> 
     <li><a href="#home"><i class="fas fa-home"></i> الرئيسية</a></li> 
-    <li><a href="#about"><i class="fas fa-user"></i> عن وعد</a></li> 
+    <li><a href="#about"><i class="fas fa-user"></i>for waad</a></li> 
     <li><a href="#education"><i class="fas fa-graduation-cap"></i> التعليم</a></li> 
     <li><a href="#skills"><i class="fas fa-code"></i> المهارات</a></li> 
     <li><a href="#contact"><i class="fas fa-envelope"></i> تواصل معي</a></li> 
    </ul> 
-   <div class="social-icons"> <a href="#"><i class="fab fa-twitter"></i></a> <a href="#"><i class="fab fa-linkedin"></i></a> <a href="#"><i class="fab fa-github"></i></a> <a href="#"><i class="fab fa-instagram"></i></a> 
+   <!-- زر المطور المضاف -->
+   <a href="https://wa.me/+963952198305" class="developer-btn">
+    <i class="fas fa-code"></i> مطور
+   </a> 
+   <div class="social-icons"> 
+    <!-- الروابط المعدلة للتواصل الاجتماعي -->
+    <a href="https://wa.me/+249111951939"><i class="fab fa-whatsapp"></i></a> 
+    <a href="https://www.facebook.com/share/1E4Fmhhg3X/"><i class="fab fa-facebook"></i></a> 
+    <a href="https://www.instagram.com/waadyassir84?igsh=bGR4M3MxZHZkOGF1"><i class="fab fa-instagram"></i></a> 
    </div> 
   </aside> <!-- المحتوى الرئيسي --> 
   <main class="content" id="content"> <!-- القسم الرئيسي --> 
@@ -1119,7 +1148,7 @@
    </section> <!-- قسم عن وعد --> 
    <section class="about" id="about"> 
     <div class="container"> 
-     <h2 class="section-title">عن <span>وعد</span></h2> 
+     <h2 class="section-title">for<span>𝐖𝐀𝐀𝐃</span></h2> 
      <div class="about-content"> 
       <div class="about-image"> 
        <div class="frame"> 
@@ -1316,7 +1345,7 @@
        </div> 
        <div class="contact-item"> <i class="fas fa-phone"></i> 
         <div> 
-         <h4>الهاتف</h4> 
+         <h4> الهاتف</h4> 
          <p>+966 50 123 4567</p> 
         </div> 
        </div> 
@@ -1336,9 +1365,9 @@
         </div> <button type="submit" class="btn">إرسال الرسالة</button> 
        </form> <!-- المربع الصغير تحت التواصل --> 
        <div class="quote-box"> 
-        <p>"التعليم هو أقوى سلاح يمكنك استخدامه لتغيير العالم"</p> 
+        <p>"⌯⎯𝓑𝓮 𝓮𝓿𝓮𝓻𝔂𝓽𝓱𝓲𝓷𝓰 𝓽𝓸 𝔂𝓸𝓾𝓻𝓼𝓮𝓵𝓯 𝓐𝓷𝓭 𝓭𝓸𝓷'𝓽 𝓽𝓻𝓾𝓼𝓽 𝓪𝓷𝔂𝓸𝓷𝓮 ⎯⌯"</p> 
         <div class="author">
-         - نيلسون مانديلا
+         - Waad Yassir
         </div> 
        </div> 
       </div> 
@@ -1364,7 +1393,11 @@
       </div> 
       <div class="footer-social"> 
        <h3>وسائل التواصل</h3> 
-       <div class="social-icons"> <a href="#"><i class="fab fa-twitter"></i></a> <a href="#"><i class="fab fa-linkedin"></i></a> <a href="#"><i class="fab fa-github"></i></a> <a href="#"><i class="fab fa-instagram"></i></a> 
+       <!-- روابط وسائل التواصل في الفوتر -->
+       <div class="social-icons"> 
+        <a href="https://wa.me/+249111951939"><i class="fab fa-whatsapp"></i></a> 
+        <a href="https://www.facebook.com/share/1E4Fmhhg3X/"><i class="fab fa-facebook"></i></a> 
+        <a href="https://www.instagram.com/waadyassir84?igsh=bGR4M3MxZHZkOGF1"><i class="fab fa-instagram"></i></a> 
        </div> 
       </div> 
      </div> 
